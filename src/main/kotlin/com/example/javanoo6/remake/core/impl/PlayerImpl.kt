@@ -1,9 +1,7 @@
 package com.example.javanoo6.remake.core.impl
 
-import org.springframework.stereotype.Service
 import com.example.javanoo6.remake.core.Player
 
-//@Service
 class PlayerImpl(
     val playerTablePoints: Set<TablePoint>,
     private val playerTableShouting: Set<TablePoint>,
