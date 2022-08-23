@@ -1,6 +1,5 @@
 package com.example.javanoo6.webpart.configuration
 
-import com.example.javanoo6.webpart.service.GameRecordService
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import org.springframework.context.annotation.Bean
@@ -19,8 +18,5 @@ class AppConfig {
     fun mongoTemplate(): MongoTemplate {
         return MongoTemplate(mongoClient(), "ping_pong_spring")
     }
-
-
-
 
 }

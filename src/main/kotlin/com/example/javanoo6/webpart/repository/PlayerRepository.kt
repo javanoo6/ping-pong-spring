@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PlayerRepository :MongoRepository<Player,ObjectId>{
-    fun findPlayerByName(name:String):List<Player>
+interface PlayerRepository : MongoRepository<Player, ObjectId> {
+    fun findPlayerByName(name: String): List<Player>
 
 }

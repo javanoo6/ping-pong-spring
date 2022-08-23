@@ -8,22 +8,24 @@ import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.GameRepository
 import org.bson.Document
 import org.bson.types.ObjectId
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation.*
 import org.springframework.data.mongodb.core.aggregation.AggregationResults
 import org.springframework.data.mongodb.core.aggregation.Fields
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation
 import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.isEqualTo
 import org.springframework.stereotype.Service
+import java.util.*
 
 
 @Service
-class GameRecordService(
-    private val gameRepository: GameRepository, private val template: MongoTemplate
-) {
+class GameRecordService {
+    @Autowired
+    lateinit var gameRepository: GameRepository
 
+    @Autowired
+    lateinit var template: MongoTemplate
 
     fun findWinnerAndDateByName(name: String): Document {
 
@@ -55,14 +57,10 @@ class GameRecordService(
 
     }
 
+    fun findById(id: String): Optional<GameRecord>? {
+        return gameRepository.findById(id)
+
+    }
+
 
 }
-
-
-/*
-    fun findWinnerAndDateByName3(name: String): MutableList<GameRecord> {
-        val test = match(where("theWinner.name").isEqualTo(name))
-        val aggregation: TypedAggregation<GameRecord> = newAggregation(GameRecord::class.java, test)
-        return template.aggregate(aggregation, GameRecord::class.java).mappedResults
-    }
-*/
