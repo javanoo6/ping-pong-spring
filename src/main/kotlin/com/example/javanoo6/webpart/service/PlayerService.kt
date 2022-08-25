@@ -20,7 +20,7 @@ class PlayerService {
 
     @Autowired
     lateinit var gameRepSer: GameRecordService
-    val game = GameImpl()
+    val game = GameImpl(gameRepSer)
     val pingPongTable = PingPongTableImpl()
     lateinit var firstPlayer: String
     lateinit var secondPlayer: String
@@ -75,7 +75,8 @@ class PlayerService {
             secondPlayer
         )
         checkInitializedPlayers(firstPlayer, secondPlayer)
-        game.run(playerOne, playerTwo, finalScore, gameRepSer)
+        game.run(playerOne, playerTwo, finalScore)
+//        game.run(playerOne, playerTwo, finalScore, gameRepSer)
         return "Игра была успешно запущена"
 
     }

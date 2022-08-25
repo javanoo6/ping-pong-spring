@@ -2,14 +2,19 @@ package com.example.javanoo6.remake.core.impl
 
 import com.example.javanoo6.remake.core.Game
 import com.example.javanoo6.webpart.service.GameRecordService
+import org.springframework.stereotype.Component
 
-class GameImpl : Game {
+@Component
+class GameImpl(var gameRepa: GameRecordService) : Game {
 
+//    @Autowired
+//    lateinit var gameRepa: GameRecordService
 
     lateinit var theWinner: PlayerImpl
     var isGameOver = false
 
-    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRep: GameRecordService) {
+    //    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRepa: GameRecordService?) {
+    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int) {
         println("ИГРА ПИНГ-ПОНГ")
         playerOne.score = 0
         playerTwo.score = 0
@@ -21,7 +26,8 @@ class GameImpl : Game {
             playerMove(playerTwo, playerOne, finalScore)
             if (isGameOver) break
         }
-        getWinner(playerOne, playerTwo, gameRep)
+        getWinner(playerOne, playerTwo)
+//        getWinner(playerOne, playerTwo, gameRep)
 
     }
 
@@ -54,7 +60,8 @@ class GameImpl : Game {
     }
 
 
-    fun getWinner(playerOne: PlayerImpl, playerTwo: PlayerImpl, gameRep: GameRecordService) {
+    fun getWinner(playerOne: PlayerImpl, playerTwo: PlayerImpl) {
+//    fun getWinner(playerOne: PlayerImpl, playerTwo: PlayerImpl, gameRep: GameRecordService) {
         if (playerOne.score > playerTwo.score) {
             println("\n${playerOne.name} победил")
             theWinner = playerOne
@@ -64,9 +71,14 @@ class GameImpl : Game {
             theWinner = playerTwo
 
         }
-        gameRep.saveGame(playerOne, playerTwo, theWinner)
+        gameRepa.saveGame(playerOne, playerTwo, theWinner)
+//        gameRep.saveGame(playerOne, playerTwo, theWinner)
 
     }
+
+//    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRep: GameRecordService) {
+//        TODO("Not yet implemented")
+//    }
 
 }
 
