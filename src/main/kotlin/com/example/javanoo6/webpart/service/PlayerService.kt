@@ -9,17 +9,14 @@ import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.PlayerRepository
 import com.example.javanoo6.webpart.request.PlayerRequest
 import org.bson.types.ObjectId
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 
 @Service
-class PlayerService {
-    @Autowired
-    lateinit var playerRepository: PlayerRepository
+class PlayerService(
+    var playerRepository: PlayerRepository, var gameRepSer: GameRecordService
+) {
 
-    @Autowired
-    lateinit var gameRepSer: GameRecordService
     val game = GameImpl(gameRepSer)
     val pingPongTable = PingPongTableImpl()
     lateinit var firstPlayer: String
@@ -36,54 +33,55 @@ class PlayerService {
 
         firstPlayer = request.playerOneName
         secondPlayer = request.playerTwoName
-
+        val messages = mutableListOf<String>()
         mutableListOf(firstPlayer, secondPlayer).forEach {
             when {
                 it.isEmpty() -> {
-                    throw Exception("Имя пустое")
+                    messages.add("$it  - Имя пустое")
                 }
                 playerRepository.findPlayerByName(it).isNotEmpty() -> {
+                    messages.add("Такой игрок с $it именем уже существует и в базу данных игроков сохранен не будет")
 
-                    throw  PlayerSaveException("Такой игрок с $it именем уже существует ")
                 }
                 else -> {
                     playerRepository.save(
                         Player(
-                            name = it,
-                            score = null
+                            name = it, score = null
                         )
                     )
                 }
             }
         }
 
-        return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
+        when {
+            messages.isNotEmpty() -> throw PlayerSaveException("устраните вышеуказанные ошибки : $messages")
+            else -> return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
+        }
+
 
     }
 
+
     fun startGame(finalScore: Int): String {
         playerOne = PlayerImpl(
-            pingPongTable.playerOneTablePoints,
-            pingPongTable.playerOneTablePointsForShouting,
-            firstPlayer
+            pingPongTable.playerOneTablePoints, pingPongTable.playerOneTablePointsForShouting, firstPlayer
 
         )
 
         playerTwo = PlayerImpl(
-            pingPongTable.playerTwoTablePoints,
-            pingPongTable.playerTwoTablePointsForShouting,
-            secondPlayer
+            pingPongTable.playerTwoTablePoints, pingPongTable.playerTwoTablePointsForShouting, secondPlayer
         )
-        checkInitializedPlayers(firstPlayer, secondPlayer)
+        checkInitializedPlayers(firstPlayer, secondPlayer, finalScore)
+
         game.run(playerOne, playerTwo, finalScore)
-//        game.run(playerOne, playerTwo, finalScore, gameRepSer)
         return "Игра была успешно запущена"
 
     }
 
-    private fun checkInitializedPlayers(firstPlayer: String, secondPlayer: String) {
+    fun checkInitializedPlayers(firstPlayer: String, secondPlayer: String, finalScore: Int) {
         if (firstPlayer.isEmpty()) throw Exception("Имя первого игрока пустое")
         if (secondPlayer.isEmpty()) throw Exception("Имя второго игрока пустое")
+        if (finalScore == 0) throw Exception("Количество поинтов не может быть равно 0")
 
     }
 

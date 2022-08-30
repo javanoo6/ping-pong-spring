@@ -16,8 +16,8 @@ class GameImpl(var gameRepa: GameRecordService) : Game {
     //    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRepa: GameRecordService?) {
     override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int) {
         println("ИГРА ПИНГ-ПОНГ")
-        playerOne.score = 0
-        playerTwo.score = 0
+//        playerOne.score = 0
+//        playerTwo.score = 0
         isGameOver = false
         println(finalScore)
         while (playerOne.score < finalScore || playerTwo.score < finalScore) {
@@ -76,9 +76,6 @@ class GameImpl(var gameRepa: GameRecordService) : Game {
 
     }
 
-//    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRep: GameRecordService) {
-//        TODO("Not yet implemented")
-//    }
 
 }
 

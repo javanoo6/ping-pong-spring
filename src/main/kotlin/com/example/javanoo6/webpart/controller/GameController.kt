@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import java.util.*
 
 @Controller
@@ -25,14 +28,14 @@ class GameController {
     }
 
     @GetMapping("/name")
-    fun findGameByName2(@RequestParam name: String): ResponseEntity<Document> {
+    fun findGameByName(@RequestParam name: String): ResponseEntity<Document> {
         val gamePlayed = gameService.findWinnerAndDateByName(name)
         return ResponseEntity(gamePlayed, HttpStatus.FOUND)
     }
 
     @GetMapping("/findById")
-    fun findGameById(@RequestParam findById: ObjectId): ResponseEntity<Document> {
-        val gamePlayed = gameService.findGameById(findById)
+    fun findFullGameById(@RequestParam findById: ObjectId): ResponseEntity<Document> {
+        val gamePlayed = gameService.findFullGameById(findById)
         return ResponseEntity(gamePlayed, HttpStatus.FOUND)
     }
 

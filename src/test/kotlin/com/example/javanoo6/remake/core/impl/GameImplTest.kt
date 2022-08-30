@@ -8,18 +8,15 @@ import org.junit.jupiter.api.Test
 
 internal class GameImplTest {
 
-    //    companion object {
     val game: GameImpl
     val pingPongTable: PingPongTableImpl
     val playerOne: PlayerImpl
     val playerTwo: PlayerImpl
-    val gameRep = mockk<GameRecordService>()
+    val gameRepSer = mockk<GameRecordService>()
 
-    //    }
     init {
         pingPongTable = PingPongTableImpl()
-        game = GameImpl(gameRep)
-//        gameRep= GameRecordService()
+        game = GameImpl(gameRepSer)
 
         playerOne = PlayerImpl(
             pingPongTable.playerOneTablePoints,
@@ -32,7 +29,7 @@ internal class GameImplTest {
             "ИгрокНомерДва", 0
         )
         every {
-            gameRep.saveGame(playerOne, playerTwo, any<PlayerImpl>())
+            gameRepSer.saveGame(playerOne, playerTwo, any<PlayerImpl>())
         } returns Unit
     }
 

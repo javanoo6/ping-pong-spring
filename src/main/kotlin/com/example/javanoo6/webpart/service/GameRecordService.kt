@@ -37,7 +37,7 @@ class GameRecordService {
         return output.rawResults
     }
 
-    fun findGameById(id: ObjectId): Document {
+    fun findFullGameById(id: ObjectId): Document {
         val project = project(Fields.fields("theWinner")).andExclude("_id").andInclude("createdDate")
         val match = match(Criteria("_id").isEqualTo(id))
         val aggregation = newAggregation(GameRecord::class.java, match, project)//
