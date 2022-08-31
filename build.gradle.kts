@@ -23,7 +23,11 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
     implementation("junit:junit:4.13.1")
-    implementation("junit:junit:4.13.1")
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json
+    implementation("org.springframework.boot:spring-boot-starter-json:2.7.3")
+// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+    implementation("com.fasterxml.jackson.core:jackson-core:2.13.3")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     implementation("io.vertx:vertx-mongo-client:4.3.3")

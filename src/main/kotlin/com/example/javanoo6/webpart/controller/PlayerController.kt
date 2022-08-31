@@ -25,20 +25,20 @@ class PlayerController(
     @GetMapping("/start")
     fun gameStart(@RequestParam finalScore: Int): ResponseEntity<String> {
         val gameStart = playerService.startGame(finalScore)
-        return ResponseEntity.ok(gameStart)
+        return ResponseEntity(gameStart, HttpStatus.ACCEPTED)
     }
 
     @GetMapping("/id/{id}")
     fun findPlayerById(@PathVariable id: ObjectId): ResponseEntity<Player> {
         val foundPlayer = playerService.findById(id)
-        return ResponseEntity(foundPlayer, HttpStatus.FOUND)
+        return ResponseEntity(foundPlayer, HttpStatus.OK)
     }
 
     @GetMapping("/name/{name}")
     fun findPlayerByName(@PathVariable name: String): ResponseEntity<List<Player>> {
         val foundPlayerByName = playerService.findPlayerByName(name)
 
-        return ResponseEntity(foundPlayerByName, HttpStatus.FOUND)
+        return ResponseEntity(foundPlayerByName, HttpStatus.OK)
     }
 
 }
