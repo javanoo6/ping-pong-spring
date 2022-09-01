@@ -1,6 +1,6 @@
-package com.example.javanoo6.webpart.core.impl
+package com.example.javanoo6.remake.core.impl
 
-import com.example.javanoo6.webpart.core.PingPongTable
+import com.example.javanoo6.remake.core.PingPongTable
 
 class PingPongTableImpl : PingPongTable {
     override val tablePoints: Set<TablePoint>

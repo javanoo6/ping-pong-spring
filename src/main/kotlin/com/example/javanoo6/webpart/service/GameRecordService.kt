@@ -2,7 +2,7 @@ package com.example.javanoo6.webpart.service
 
 //import org.springframework.data.mongodb.core.query.where
 
-import com.example.javanoo6.webpart.core.impl.PlayerImpl
+import com.example.javanoo6.remake.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.model.GameRecord
 import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.GameRepository
@@ -27,7 +27,7 @@ class GameRecordService {
     @Autowired
     lateinit var template: MongoTemplate
 
-    fun findGameWinnerAndDateByName(name: String): Document {
+    fun findWinnerAndDateByName(name: String): Document {
 
         val projectStage = project(Fields.fields("theWinner")).andExclude("_id").andInclude("createdDate")
         val matchStage = match(Criteria("theWinner.name").isEqualTo(name))
@@ -37,7 +37,7 @@ class GameRecordService {
         return output.rawResults
     }
 
-    fun findGameWinnerById(id: ObjectId): Document {
+    fun findGameById(id: ObjectId): Document {
         val project = project(Fields.fields("theWinner")).andExclude("_id").andInclude("createdDate")
         val match = match(Criteria("_id").isEqualTo(id))
         val aggregation = newAggregation(GameRecord::class.java, match, project)//
@@ -57,8 +57,7 @@ class GameRecordService {
 
     }
 
-    //    findFullGameById
-    fun findFullGameById(id: String): Optional<GameRecord>? {
+    fun findById(id: String): Optional<GameRecord>? {
         return gameRepository.findById(id)
 
     }

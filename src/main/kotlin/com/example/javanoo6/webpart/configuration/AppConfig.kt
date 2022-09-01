@@ -19,10 +19,4 @@ class AppConfig {
         return MongoTemplate(mongoClient(), "ping_pong_spring")
     }
 
-
-//    @Bean
-//    fun gameImpl(): GameImpl {
-//        return GameImpl()
-//    }
-
 }

@@ -5,4 +5,3 @@ import org.springframework.web.bind.annotation.ResponseStatus
 
 @ResponseStatus(HttpStatus.CONFLICT)
 class PlayerSaveException(msg: String) : RuntimeException(msg)
-
