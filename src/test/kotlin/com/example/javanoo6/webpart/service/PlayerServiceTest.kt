@@ -1,8 +1,8 @@
 package com.example.javanoo6.webpart.service
 
-import com.example.javanoo6.remake.core.impl.GameImpl
-import com.example.javanoo6.remake.core.impl.PingPongTableImpl
-import com.example.javanoo6.remake.core.impl.PlayerImpl
+import com.example.javanoo6.webpart.core.impl.GameImpl
+import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.PlayerRepository
 import io.kotest.matchers.should
@@ -27,7 +27,8 @@ internal class PlayerServiceTest {
     val name = "PlayeOne"
 
     init {
-        game = GameImpl(gameRepSer)
+        game = GameImpl()
+//        game = GameImpl(gameRepSer)
         pingPongTable = PingPongTableImpl()
 
         playerOne = PlayerImpl(

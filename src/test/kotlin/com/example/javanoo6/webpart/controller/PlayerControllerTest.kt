@@ -1,108 +1,125 @@
 package com.example.javanoo6.webpart.controller
 
+import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.request.PlayerRequest
 import com.example.javanoo6.webpart.service.PlayerService
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.mockk.mockk
+import com.ninjasquad.springmockk.MockkBean
+import io.kotest.matchers.throwable.haveMessage
+import io.mockk.every
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 
-
-@RunWith(SpringRunner::class)
-@SpringBootTest
+@WebMvcTest(controllers = [PlayerController::class])
 internal class PlayerControllerTest {
 
     val baseUrl = "/players"
-    val playerService = mockk<PlayerService>()
     val name = "PlayerName"
     val finalScore = 10
     val objectId: ObjectId = ObjectId.get()
-    var notCorrectPlayerRequest = PlayerRequest("", " ")
+    var notCorrectPlayerRequest = PlayerRequest("", "")
     var correctPlayerRequest = PlayerRequest("nameOne", "pl2")
     var objectMapper = ObjectMapper()
+    val player = Player("PlayerName", null)
 
     @Autowired
-    private lateinit var webApplicationContext: WebApplicationContext
+    private lateinit var mockMvc: MockMvc
 
-    private val mockMvc: MockMvc by lazy {
-        MockMvcBuilders.webAppContextSetup(webApplicationContext).build()
-    }
-
+    @MockkBean
+    private lateinit var playerService: PlayerService
 
     @Test
     fun `should find player by id`() {
-        mockMvc.get("$baseUrl/id/") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(objectId)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
-            status { HttpStatus.OK }
-        }.andExpect {
-            MockMvcResultMatchers.content().string("{}")
+        every {
+            playerService.findById(objectId)
+        } returns player
+        mockMvc.get("$baseUrl/id/$objectId") {
         }
+            .andDo { MockMvcResultHandlers.print() }
+            .andExpect {
+                status { HttpStatus.OK }
+                content { contentType(MediaType.APPLICATION_JSON) }
+                jsonPath("name") { value("PlayerName") }
+
+            }
     }
 
 
     @Test
     fun `should find player by name`() {
-        mockMvc.get("$baseUrl/name/:name") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(name)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect {
+        every {
+            playerService.findPlayerByName(name)
+        } returns listOf(player)
+        mockMvc.get("$baseUrl/name/$name") {
+        }.andDo { MockMvcResultHandlers.print() }.andExpect {
             status { HttpStatus.OK }
-        }.andExpect {
-            MockMvcResultMatchers.content().string("{}")
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("[0].name") { value("PlayerName") }
         }
+            .andExpect {
+                MockMvcResultMatchers.content().string("{}")
+            }
     }
 
     @Test
     fun `should  setup player names`() {
+        every {
+            playerService.setPlayersNames(correctPlayerRequest)
+        } returns String()
         mockMvc.post("$baseUrl/playerNames") {
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(correctPlayerRequest)
-            accept = MediaType.APPLICATION_JSON
+        }.andDo { MockMvcResultHandlers.print() }.andExpect {
+            status { HttpStatus.OK }
 
         }.andExpect {
-            status { HttpStatus.CREATED }
-
-        }.andExpect {
-            MockMvcResultMatchers.content().string("{}")
+            MockMvcResultMatchers.content().string(
+                "Оба игрока ${correctPlayerRequest.playerOneName}" +
+                        " ${correctPlayerRequest.playerTwoName} были добавлены в базу данных"
+            )
         }
     }
 
 
     @Test
     fun `should not setup player names`() {
+        every {
+            playerService.setPlayersNames(notCorrectPlayerRequest)
+        } returns String()
         mockMvc.post("$baseUrl/playerNames") {
             contentType = MediaType.APPLICATION_JSON
             content = objectMapper.writeValueAsString(notCorrectPlayerRequest)
-            accept = MediaType.APPLICATION_JSON
-
-        }.andExpect {
-            status { HttpStatus.CONFLICT }
-        }
+        }.andDo { MockMvcResultHandlers.print() }
+            .andExpect {
+                status { HttpStatus.CONFLICT }
+                content { contentType("text/plain;charset=UTF-8") }
+                haveMessage("устраните вышеуказанные ошибки : ")
+            }
+            .andExpect {
+                MockMvcResultMatchers.content().string("{}")
+            }
     }
 
     @Test
     fun `should start game`() {
-        mockMvc.get("$baseUrl/start") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(finalScore)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect { status { HttpStatus.ACCEPTED } }
+        every {
+            playerService.startGame(finalScore)
+        } returns String()
+        mockMvc.get("$baseUrl/start?finalScore=$finalScore") {
+        }.andDo { MockMvcResultHandlers.print() }.andExpect {
+            status { HttpStatus.ACCEPTED }
+            content { contentType("text/plain;charset=UTF-8") }
+            haveMessage("Игра была успешно запущена")
+        }
 
     }
 

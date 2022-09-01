@@ -21,12 +21,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
     implementation("junit:junit:4.13.1")
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-json
-    implementation("org.springframework.boot:spring-boot-starter-json:2.7.3")
-// https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
-    implementation("com.fasterxml.jackson.core:jackson-core:2.13.3")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
@@ -34,7 +31,9 @@ dependencies {
 // https://mvnrepository.com/artifact/io.kotest/kotest-runner-junit5-jvm
     testImplementation("io.kotest:kotest-runner-junit5-jvm:5.4.2")
 
-    testImplementation("io.mockk:mockk:1.9.3")
+    testImplementation("io.mockk:mockk:1.12.7")
+
+    testImplementation("com.ninja-squad:springmockk:3.1.1")
 
 }
 

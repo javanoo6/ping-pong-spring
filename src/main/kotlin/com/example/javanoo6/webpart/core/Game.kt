@@ -1,6 +1,6 @@
-package com.example.javanoo6.remake.core
+package com.example.javanoo6.webpart.core
 
-import com.example.javanoo6.remake.core.impl.PlayerImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 
 interface Game {
     fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int)

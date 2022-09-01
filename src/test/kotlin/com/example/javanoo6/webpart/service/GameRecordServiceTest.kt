@@ -31,6 +31,8 @@ internal class GameRecordServiceTest {
     @Test
     fun findWinnerAndDateByName() {
         val result = template.aggregate(aggregation, gameRecord::class.java)
+
+        println(result)
         verify { template.aggregate(aggregation, gameRecord::class.java) }
         assertEquals(output, result)
 

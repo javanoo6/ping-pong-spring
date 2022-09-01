@@ -1,65 +1,80 @@
 package com.example.javanoo6.webpart.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.javanoo6.webpart.model.GameRecord
+import com.example.javanoo6.webpart.model.Player
+import com.example.javanoo6.webpart.service.GameRecordService
+import com.ninjasquad.springmockk.MockkBean
+import io.mockk.every
+import org.bson.Document
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Test
-import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.time.LocalDateTime
+import java.util.*
 
-@RunWith(SpringRunner::class)
-@SpringBootTest
+@WebMvcTest(controllers = [GameController::class])
 internal class GameControllerTest {
 
     val baseUrl = "/game"
     val objectId: ObjectId = ObjectId.get()
     val objectIdString = ObjectId.get().toString()
     val name = "playerName"
+    val gameRecord = GameRecord(
+        objectId, Player("playerOne", 7),
+        Player("playerTwo", 10), Player("playerTwo", 10), LocalDateTime.now()
+    )
+
 
     @Autowired
-    private lateinit var webApplicationContext: WebApplicationContext
+    private lateinit var mockMvc: MockMvc
 
-    private val mockMvc: MockMvc by lazy {
-        MockMvcBuilders.webAppContextSetup(webApplicationContext).build()
-    }
-    var objectMapper = ObjectMapper()
-
-
-    @Test
-    fun `should find game by Id`() {
-        mockMvc.get("$baseUrl/id/:id") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(objectIdString)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect { status { HttpStatus.OK } }
-    }
-
-
-    @Test
-    fun `should find game by playerName`() {
-        mockMvc.get("$baseUrl/name?name=") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(name)
-            accept = MediaType.APPLICATION_JSON
-        }
-            .andExpect { status { HttpStatus.OK } }
-    }
-
+    @MockkBean
+    private lateinit var gameService: GameRecordService
 
     @Test
     fun `should find full game by Id`() {
-        mockMvc.get("$baseUrl/findById") {
-            contentType = MediaType.APPLICATION_JSON
-            content = objectMapper.writeValueAsString(objectId)
-            accept = MediaType.APPLICATION_JSON
-        }.andExpect { status { HttpStatus.OK } }
+        every {
+            gameService.findFullGameById(objectIdString)
+        } returns Optional.of(gameRecord)
+        mockMvc.get("$baseUrl/id/$objectIdString") {
+        }.andExpect {
+            status { HttpStatus.OK }
+            content { contentType(MediaType.APPLICATION_JSON) }
+            jsonPath("firstParticipant.name") { value("playerOne") }
+        }
+    }
+
+
+    @Test
+    fun `should find game winner by playerName`() {
+        every {
+            gameService.findGameWinnerAndDateByName(name)
+        } returns Document()
+        mockMvc.get("$baseUrl/name?name=$name") {
+        }
+            .andExpect {
+                status { HttpStatus.OK }
+            }.andExpect {
+                MockMvcResultMatchers.content().string("{}")
+            }
+    }
+
+
+    @Test
+    fun `should find game winner by Id`() {
+        every {
+            gameService.findGameWinnerById(objectId)
+        } returns Document()
+        mockMvc.get("$baseUrl/findById?Id=$objectId") {
+        }.andExpect { status { HttpStatus.OK } }.andExpect {
+            MockMvcResultMatchers.content().string("{}")
+        }
     }
 
 }

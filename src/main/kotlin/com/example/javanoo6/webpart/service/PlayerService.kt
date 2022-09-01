@@ -1,23 +1,29 @@
 package com.example.javanoo6.webpart.service
 
-import com.example.javanoo6.remake.core.impl.GameImpl
-import com.example.javanoo6.remake.core.impl.PingPongTableImpl
-import com.example.javanoo6.remake.core.impl.PlayerImpl
+import com.example.javanoo6.webpart.core.impl.GameImpl
+import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.exceptions.PLayerNotFoundException
 import com.example.javanoo6.webpart.exceptions.PlayerSaveException
 import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.PlayerRepository
 import com.example.javanoo6.webpart.request.PlayerRequest
 import org.bson.types.ObjectId
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 
 @Service
 class PlayerService(
-    var playerRepository: PlayerRepository, var gameRepSer: GameRecordService
+    val playerRepository: PlayerRepository
+//    val game : GameImpl
+//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
+//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
 ) {
+    @Autowired
+    lateinit var game: GameImpl
 
-    val game = GameImpl(gameRepSer)
+    //    val game = GameImpl(gameRepSer)
     val pingPongTable = PingPongTableImpl()
     lateinit var firstPlayer: String
     lateinit var secondPlayer: String
@@ -33,14 +39,14 @@ class PlayerService(
 
         firstPlayer = request.playerOneName
         secondPlayer = request.playerTwoName
-        val messages = mutableListOf<String>()
+        val errorMessages = mutableListOf<String>()
         mutableListOf(firstPlayer, secondPlayer).forEach {
             when {
                 it.isEmpty() -> {
-                    messages.add("$it  - Имя пустое")
+                    errorMessages.add("$it  - Имя пустое")
                 }
                 playerRepository.findPlayerByName(it).isNotEmpty() -> {
-                    messages.add("Такой игрок с $it именем уже существует и в базу данных игроков сохранен не будет")
+                    errorMessages.add("Такой игрок с $it именем уже существует и в базу данных игроков сохранен не будет")
 
                 }
                 else -> {
@@ -53,10 +59,8 @@ class PlayerService(
             }
         }
 
-        when {
-            messages.isNotEmpty() -> throw PlayerSaveException("устраните вышеуказанные ошибки : $messages")
-            else -> return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
-        }
+        if (errorMessages.isNotEmpty()) throw PlayerSaveException("устраните вышеуказанные ошибки : $errorMessages")
+        return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
 
 
     }

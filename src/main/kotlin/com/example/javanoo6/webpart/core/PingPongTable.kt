@@ -1,6 +1,6 @@
-package com.example.javanoo6.remake.core
+package com.example.javanoo6.webpart.core
 
-import com.example.javanoo6.remake.core.impl.TablePoint
+import com.example.javanoo6.webpart.core.impl.TablePoint
 
 interface PingPongTable {
      val tablePoints: Set<TablePoint>

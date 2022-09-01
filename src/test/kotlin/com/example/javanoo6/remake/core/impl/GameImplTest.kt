@@ -1,5 +1,8 @@
 package com.example.javanoo6.remake.core.impl
 
+import com.example.javanoo6.webpart.core.impl.GameImpl
+import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.service.GameRecordService
 import io.kotest.matchers.should
 import io.mockk.every
@@ -8,26 +11,24 @@ import org.junit.jupiter.api.Test
 
 internal class GameImplTest {
 
-    val game: GameImpl
-    val pingPongTable: PingPongTableImpl
-    val playerOne: PlayerImpl
-    val playerTwo: PlayerImpl
-    val gameRepSer = mockk<GameRecordService>()
+    private val gameRepSer = mockk<GameRecordService>()
+    private val game: GameImpl = GameImpl()
+
+    //    private val game: GameImpl =GameImpl(gameRepSer)
+    private val pingPongTable: PingPongTableImpl = PingPongTableImpl()
+    private val playerOne = PlayerImpl(
+        pingPongTable.playerOneTablePoints,
+        pingPongTable.playerOneTablePointsForShouting,
+        "игрокНомерОдин", 0
+    )
+    private val playerTwo = PlayerImpl(
+        pingPongTable.playerTwoTablePoints,
+        pingPongTable.playerTwoTablePointsForShouting,
+        "ИгрокНомерДва", 0
+    )
+
 
     init {
-        pingPongTable = PingPongTableImpl()
-        game = GameImpl(gameRepSer)
-
-        playerOne = PlayerImpl(
-            pingPongTable.playerOneTablePoints,
-            pingPongTable.playerOneTablePointsForShouting,
-            "игрокНомерОдин", 0
-        )
-        playerTwo = PlayerImpl(
-            pingPongTable.playerTwoTablePoints,
-            pingPongTable.playerTwoTablePointsForShouting,
-            "ИгрокНомерДва", 0
-        )
         every {
             gameRepSer.saveGame(playerOne, playerTwo, any<PlayerImpl>())
         } returns Unit
