@@ -1,6 +1,6 @@
-package com.example.javanoo6.remake.core.impl
+package com.example.javanoo6.webpart.core.impl
 
-import com.example.javanoo6.remake.core.Player
+import com.example.javanoo6.webpart.core.Player
 
 class PlayerImpl(
     val playerTablePoints: Set<TablePoint>,

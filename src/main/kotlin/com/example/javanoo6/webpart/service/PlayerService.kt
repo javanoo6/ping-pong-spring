@@ -1,8 +1,8 @@
 package com.example.javanoo6.webpart.service
 
-import com.example.javanoo6.remake.core.impl.GameImpl
-import com.example.javanoo6.remake.core.impl.PingPongTableImpl
-import com.example.javanoo6.remake.core.impl.PlayerImpl
+import com.example.javanoo6.webpart.core.impl.GameImpl
+import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.exceptions.PLayerNotFoundException
 import com.example.javanoo6.webpart.exceptions.PlayerSaveException
 import com.example.javanoo6.webpart.model.Player
@@ -14,13 +14,16 @@ import org.springframework.stereotype.Service
 
 
 @Service
-class PlayerService {
+class PlayerService(
+    val playerRepository: PlayerRepository
+//    val game : GameImpl
+//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
+//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
+) {
     @Autowired
-    lateinit var playerRepository: PlayerRepository
+    lateinit var game: GameImpl
 
-    @Autowired
-    lateinit var gameRepSer: GameRecordService
-    val game = GameImpl()
+    //    val game = GameImpl(gameRepSer)
     val pingPongTable = PingPongTableImpl()
     lateinit var firstPlayer: String
     lateinit var secondPlayer: String
@@ -36,53 +39,53 @@ class PlayerService {
 
         firstPlayer = request.playerOneName
         secondPlayer = request.playerTwoName
-
+        val errorMessages = mutableListOf<String>()
         mutableListOf(firstPlayer, secondPlayer).forEach {
             when {
                 it.isEmpty() -> {
-                    throw Exception("Имя пустое")
+                    errorMessages.add("$it  - Имя пустое")
                 }
                 playerRepository.findPlayerByName(it).isNotEmpty() -> {
+                    errorMessages.add("Такой игрок с $it именем уже существует и в базу данных игроков сохранен не будет")
 
-                    throw  PlayerSaveException("Такой игрок с $it именем уже существует ")
                 }
                 else -> {
                     playerRepository.save(
                         Player(
-                            name = it,
-                            score = null
+                            name = it, score = null
                         )
                     )
                 }
             }
         }
 
+        if (errorMessages.isNotEmpty()) throw PlayerSaveException("устраните вышеуказанные ошибки : $errorMessages")
         return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
+
 
     }
 
+
     fun startGame(finalScore: Int): String {
         playerOne = PlayerImpl(
-            pingPongTable.playerOneTablePoints,
-            pingPongTable.playerOneTablePointsForShouting,
-            firstPlayer
+            pingPongTable.playerOneTablePoints, pingPongTable.playerOneTablePointsForShouting, firstPlayer
 
         )
 
         playerTwo = PlayerImpl(
-            pingPongTable.playerTwoTablePoints,
-            pingPongTable.playerTwoTablePointsForShouting,
-            secondPlayer
+            pingPongTable.playerTwoTablePoints, pingPongTable.playerTwoTablePointsForShouting, secondPlayer
         )
-        checkInitializedPlayers(firstPlayer, secondPlayer)
-        game.run(playerOne, playerTwo, finalScore, gameRepSer)
+        checkInitializedPlayers(firstPlayer, secondPlayer, finalScore)
+
+        game.run(playerOne, playerTwo, finalScore)
         return "Игра была успешно запущена"
 
     }
 
-    private fun checkInitializedPlayers(firstPlayer: String, secondPlayer: String) {
+    fun checkInitializedPlayers(firstPlayer: String, secondPlayer: String, finalScore: Int) {
         if (firstPlayer.isEmpty()) throw Exception("Имя первого игрока пустое")
         if (secondPlayer.isEmpty()) throw Exception("Имя второго игрока пустое")
+        if (finalScore == 0) throw Exception("Количество поинтов не может быть равно 0")
 
     }
 

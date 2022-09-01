@@ -1,18 +1,22 @@
-package com.example.javanoo6.remake.core.impl
+package com.example.javanoo6.webpart.core.impl
 
-import com.example.javanoo6.remake.core.Game
+import com.example.javanoo6.webpart.core.Game
 import com.example.javanoo6.webpart.service.GameRecordService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
+@Component
+//class GameImpl() : Game {
 class GameImpl : Game {
-
+    //class GameImpl(var gameRecordService: GameRecordService) : Game {
+    @Autowired
+    lateinit var gameRecordService: GameRecordService
 
     lateinit var theWinner: PlayerImpl
     var isGameOver = false
 
-    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int, gameRep: GameRecordService) {
+    override fun run(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int) {
         println("ИГРА ПИНГ-ПОНГ")
-        playerOne.score = 0
-        playerTwo.score = 0
         isGameOver = false
         println(finalScore)
         while (playerOne.score < finalScore || playerTwo.score < finalScore) {
@@ -21,7 +25,7 @@ class GameImpl : Game {
             playerMove(playerTwo, playerOne, finalScore)
             if (isGameOver) break
         }
-        getWinner(playerOne, playerTwo, gameRep)
+        getWinner(playerOne, playerTwo)
 
     }
 
@@ -54,7 +58,7 @@ class GameImpl : Game {
     }
 
 
-    fun getWinner(playerOne: PlayerImpl, playerTwo: PlayerImpl, gameRep: GameRecordService) {
+    fun getWinner(playerOne: PlayerImpl, playerTwo: PlayerImpl) {
         if (playerOne.score > playerTwo.score) {
             println("\n${playerOne.name} победил")
             theWinner = playerOne
@@ -64,9 +68,10 @@ class GameImpl : Game {
             theWinner = playerTwo
 
         }
-        gameRep.saveGame(playerOne, playerTwo, theWinner)
+        gameRecordService.saveGame(playerOne, playerTwo, theWinner)
 
     }
+
 
 }
 
