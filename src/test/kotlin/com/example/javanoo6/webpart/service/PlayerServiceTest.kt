@@ -34,8 +34,6 @@ internal class PlayerServiceTest {
 
     @Test
     fun `should find player by ObjectId`() {
-
-
         every { playerRepository.findById(objectId) } returns Optional.of(player)
         val result = playerService.findById(objectId)
         verify { playerRepository.findById(objectId) }

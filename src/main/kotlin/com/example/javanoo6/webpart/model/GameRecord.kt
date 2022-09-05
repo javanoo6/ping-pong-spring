@@ -10,9 +10,9 @@ import java.time.LocalDateTime
 data class GameRecord(
     @Id
     val id: ObjectId? = null,
-    val firstParticipant: Player?,
-    val secondParticipant: Player?,
-    val theWinner: Player?,
+    val firstParticipant: Player,
+    val secondParticipant: Player,
+    val theWinner: Player,
     @CreatedDate
     val createdDate: LocalDateTime? = null
 )

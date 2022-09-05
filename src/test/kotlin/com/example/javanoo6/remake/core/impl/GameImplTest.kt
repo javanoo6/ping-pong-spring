@@ -6,7 +6,6 @@ import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.model.GameRecord
 import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.service.GameRecordService
-import io.kotest.matchers.should
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -17,7 +16,6 @@ internal class GameImplTest {
     private val gameRecordService = mockk<GameRecordService>()
     private val game: GameImpl = GameImpl(gameRecordService)
 
-    //    private val game: GameImpl =GameImpl(gameRepSer)
     private val pingPongTable: PingPongTableImpl = PingPongTableImpl()
     private val playerOne = PlayerImpl(
         pingPongTable.playerOneTablePoints,
@@ -36,11 +34,7 @@ internal class GameImplTest {
         secondParticipant = Player("${playerTwo.name}", playerTwo.score),
         theWinner = Player("${theWinner.name}", theWinner.score)
     )
-//    init {
-//        every {
-//            gameRepSer.saveGame(playerOne, playerTwo, any<PlayerImpl>())
-//        } returns Unit
-//    }
+
 
 
     @Test
@@ -48,8 +42,7 @@ internal class GameImplTest {
         every {
             gameRecordService.saveGame(playerOne, playerTwo, playerTwo)
         } returns gameRecord
-        val result = game.run(playerOne, playerTwo, finalScore = 10)
+        game.run(playerOne, playerTwo, finalScore = 10)
         verify { gameRecordService.saveGame(playerOne, playerTwo, playerTwo) }
-//        game.run(playerOne, playerTwo, finalScore = 10).should { game.isGameOver }
     }
 }
