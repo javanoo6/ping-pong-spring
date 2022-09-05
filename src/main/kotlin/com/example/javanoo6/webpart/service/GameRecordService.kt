@@ -8,7 +8,6 @@ import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.GameRepository
 import org.bson.Document
 import org.bson.types.ObjectId
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation.*
 import org.springframework.data.mongodb.core.aggregation.AggregationResults
@@ -20,12 +19,11 @@ import java.util.*
 
 
 @Service
-class GameRecordService {
-    @Autowired
-    lateinit var gameRepository: GameRepository
+class GameRecordService(
+    var gameRepository: GameRepository,
+    var template: MongoTemplate
+) {
 
-    @Autowired
-    lateinit var template: MongoTemplate
 
     fun findGameWinnerAndDateByName(name: String): Document {
 
@@ -46,18 +44,16 @@ class GameRecordService {
         return output.rawResults
     }
 
-    fun saveGame(playerOne: PlayerImpl, playerTwo: PlayerImpl, theWinner: PlayerImpl) {
-        gameRepository.save(
+    fun saveGame(playerOne: PlayerImpl, playerTwo: PlayerImpl, theWinner: PlayerImpl): GameRecord {
+        return gameRepository.save(
             GameRecord(
                 firstParticipant = Player(name = playerOne.name, score = playerOne.score),
                 secondParticipant = Player(name = playerTwo.name, score = playerTwo.score),
                 theWinner = Player(name = theWinner.name, score = theWinner.score)
             )
         )
-
     }
 
-    //    findFullGameById
     fun findFullGameById(id: String): Optional<GameRecord>? {
         return gameRepository.findById(id)
 

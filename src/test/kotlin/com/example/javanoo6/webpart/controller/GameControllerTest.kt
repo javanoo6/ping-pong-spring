@@ -25,6 +25,7 @@ internal class GameControllerTest {
     val objectId: ObjectId = ObjectId.get()
     val objectIdString = ObjectId.get().toString()
     val name = "playerName"
+
     val gameRecord = GameRecord(
         objectId, Player("playerOne", 7),
         Player("playerTwo", 10), Player("playerTwo", 10), LocalDateTime.now()

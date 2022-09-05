@@ -2,15 +2,10 @@ package com.example.javanoo6.webpart.core.impl
 
 import com.example.javanoo6.webpart.core.Game
 import com.example.javanoo6.webpart.service.GameRecordService
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-//class GameImpl() : Game {
-class GameImpl : Game {
-    //class GameImpl(var gameRecordService: GameRecordService) : Game {
-    @Autowired
-    lateinit var gameRecordService: GameRecordService
+class GameImpl(var gameRecordService: GameRecordService) : Game {
 
     lateinit var theWinner: PlayerImpl
     var isGameOver = false

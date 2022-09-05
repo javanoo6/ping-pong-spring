@@ -9,27 +9,29 @@ import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.PlayerRepository
 import com.example.javanoo6.webpart.request.PlayerRequest
 import org.bson.types.ObjectId
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 
 @Service
 class PlayerService(
-    val playerRepository: PlayerRepository
-//    val game : GameImpl
-//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
-//    val playerRepository: PlayerRepository, val gameRepSer: GameRecordService
+    val playerRepository: PlayerRepository,
+    var gameImpl: GameImpl
 ) {
-    @Autowired
-    lateinit var game: GameImpl
 
-    //    val game = GameImpl(gameRepSer)
     val pingPongTable = PingPongTableImpl()
-    lateinit var firstPlayer: String
-    lateinit var secondPlayer: String
-    lateinit var playerOne: PlayerImpl
-    lateinit var playerTwo: PlayerImpl
 
+    var playerOne = PlayerImpl(
+        pingPongTable.playerOneTablePoints,
+        pingPongTable.playerOneTablePointsForShouting,
+        "игрокНомерОдин", 0
+    )
+    var playerTwo = PlayerImpl(
+        pingPongTable.playerTwoTablePoints,
+        pingPongTable.playerTwoTablePointsForShouting,
+        "ИгрокНомерДва", 0
+    )
+    var firstPlayer: String? = playerOne.name
+    var secondPlayer: String? = playerTwo.name
 
     fun findById(id: ObjectId): Player =
         playerRepository.findById(id).orElseThrow { (PLayerNotFoundException("такого игрока с $id не найдено ")) }
@@ -42,7 +44,7 @@ class PlayerService(
         val errorMessages = mutableListOf<String>()
         mutableListOf(firstPlayer, secondPlayer).forEach {
             when {
-                it.isEmpty() -> {
+                it?.isEmpty()!! -> {
                     errorMessages.add("$it  - Имя пустое")
                 }
                 playerRepository.findPlayerByName(it).isNotEmpty() -> {
@@ -60,32 +62,41 @@ class PlayerService(
         }
 
         if (errorMessages.isNotEmpty()) throw PlayerSaveException("устраните вышеуказанные ошибки : $errorMessages")
+        else initializePlayers(request.playerOneName, request.playerTwoName)
         return ("Оба игрока ${request.playerOneName} ${request.playerTwoName} были добавлены в базу данных")
 
 
     }
 
-
-    fun startGame(finalScore: Int): String {
+    fun initializePlayers(playerOneName: String, playerTwoName: String) {
         playerOne = PlayerImpl(
-            pingPongTable.playerOneTablePoints, pingPongTable.playerOneTablePointsForShouting, firstPlayer
+            pingPongTable.playerOneTablePoints, pingPongTable.playerOneTablePointsForShouting, playerOneName
 
         )
-
         playerTwo = PlayerImpl(
-            pingPongTable.playerTwoTablePoints, pingPongTable.playerTwoTablePointsForShouting, secondPlayer
+            pingPongTable.playerTwoTablePoints, pingPongTable.playerTwoTablePointsForShouting, playerTwoName
         )
-        checkInitializedPlayers(firstPlayer, secondPlayer, finalScore)
+    }
 
-        game.run(playerOne, playerTwo, finalScore)
+
+    fun startGame(finalScore: Int = 10): String {
+        checkInitializedPlayers(playerOne.name, playerTwo.name, finalScore)
+        startGameButWithParametres(playerOne, playerTwo, finalScore)
+
         return "Игра была успешно запущена"
 
     }
 
-    fun checkInitializedPlayers(firstPlayer: String, secondPlayer: String, finalScore: Int) {
-        if (firstPlayer.isEmpty()) throw Exception("Имя первого игрока пустое")
-        if (secondPlayer.isEmpty()) throw Exception("Имя второго игрока пустое")
+    fun startGameButWithParametres(playerOne: PlayerImpl, playerTwo: PlayerImpl, finalScore: Int) {
+        gameImpl.run(playerOne, playerTwo, finalScore)
+
+    }
+
+    fun checkInitializedPlayers(firstPlayer: String?, secondPlayer: String?, finalScore: Int) {
+        if (firstPlayer?.isEmpty()!!) throw Exception("Имя первого игрока пустое")
+        if (secondPlayer?.isEmpty()!!) throw Exception("Имя второго игрока пустое")
         if (finalScore == 0) throw Exception("Количество поинтов не может быть равно 0")
+        if (finalScore < 0) throw Exception("Количество поинтов не может быть меньше 0")
 
     }
 

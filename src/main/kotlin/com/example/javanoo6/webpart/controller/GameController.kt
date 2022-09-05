@@ -17,22 +17,16 @@ class GameController {
 
     @GetMapping("/id/{id}")
     fun findFullGameById(@PathVariable id: String): Optional<GameRecord>? {
-//        val gamePlayed = gameService.findById(id)
-//        return ResponseEntity(gamePlayed, HttpStatus.OK)
         return gameService.findFullGameById(id)
     }
 
     @GetMapping("/name")
     fun findGameByName(@RequestParam name: String): Document {
-//        val gamePlayed = gameService.findWinnerAndDateByName(name)
-//        return ResponseEntity(gamePlayed, HttpStatus.OK)
         return gameService.findGameWinnerAndDateByName(name)
     }
 
     @GetMapping("/findById")
     fun findGameById(@RequestParam findById: ObjectId): Document {
-//        val gamePlayed = gameService.findFullGameById(findById)
-//        return ResponseEntity(gamePlayed, HttpStatus.OK)
         return gameService.findGameWinnerById(findById)
     }
 

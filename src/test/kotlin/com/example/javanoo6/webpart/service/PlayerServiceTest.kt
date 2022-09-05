@@ -5,67 +5,60 @@ import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
 import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.PlayerRepository
-import io.kotest.matchers.should
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.bson.types.ObjectId
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.springframework.data.repository.findByIdOrNull
+import java.util.*
 
 internal class PlayerServiceTest {
 
-    val gameRepSer = mockk<GameRecordService>()
     val playerRepository = mockk<PlayerRepository>()
+
     val player = mockk<Player>()
     val objectId = mockk<ObjectId>()
-    val game: GameImpl
-    val pingPongTable: PingPongTableImpl
-    val playerOne: PlayerImpl
-    val playerTwo: PlayerImpl
+
+    val gameImpl = mockk<GameImpl>()
+    val playerService = PlayerService(playerRepository, gameImpl)
+
+    val pingPongTable: PingPongTableImpl = PingPongTableImpl()
+    val playerOne: PlayerImpl = PlayerImpl(
+        pingPongTable.playerOneTablePoints, pingPongTable.playerOneTablePointsForShouting, "игрокНомерОдин", 0
+    )
+    val playerTwo: PlayerImpl = PlayerImpl(
+        pingPongTable.playerTwoTablePoints, pingPongTable.playerTwoTablePointsForShouting, "ИгрокНомерДва", 0
+    )
     val name = "PlayeOne"
 
-    init {
-        game = GameImpl()
-//        game = GameImpl(gameRepSer)
-        pingPongTable = PingPongTableImpl()
-
-        playerOne = PlayerImpl(
-            pingPongTable.playerOneTablePoints,
-            pingPongTable.playerOneTablePointsForShouting,
-            "игрокНомерОдин", 0
-        )
-        playerTwo = PlayerImpl(
-            pingPongTable.playerTwoTablePoints,
-            pingPongTable.playerTwoTablePointsForShouting,
-            "ИгрокНомерДва", 0
-        )
-        every {
-            gameRepSer.saveGame(playerOne, playerTwo, any<PlayerImpl>())
-        } returns Unit
-
-        every {
-            playerRepository.findPlayerByName(name)
-        } returns mutableListOf()
-    }
-
-
     @Test
-    fun findById() {
-        every { playerRepository.findByIdOrNull(objectId) } returns player
+    fun `should find player by ObjectId`() {
+
+
+        every { playerRepository.findById(objectId) } returns Optional.of(player)
+        val result = playerService.findById(objectId)
+        verify { playerRepository.findById(objectId) }
+        assertEquals(player, result)
     }
 
     @Test
     fun startGame() {
-        game.run(playerOne, playerTwo, 5).should { game.isGameOver }
+        every { gameImpl.run(playerOne, playerTwo, 15) } returns Unit
+        playerService.playerOne = playerOne
+        playerService.playerTwo = playerTwo
+        playerService.startGame(15)
+        verify { gameImpl.run(playerOne, playerTwo, 15) }
     }
 
     @Test
-    fun findPlayerByName() {
-        val result = playerRepository.findPlayerByName(name)
+    fun `should find player by name`() {
+        every {
+            playerRepository.findPlayerByName(name)
+        } returns listOf(player)
+        val result = playerService.findPlayerByName(name)
         verify { playerRepository.findPlayerByName(name) }
-        assertEquals(listOf<Player>(), result)
+        assertEquals(listOf(player), result)
     }
 
 

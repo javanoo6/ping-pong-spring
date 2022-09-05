@@ -1,6 +1,9 @@
 package com.example.javanoo6.webpart.service
 
+import com.example.javanoo6.webpart.core.impl.PingPongTableImpl
+import com.example.javanoo6.webpart.core.impl.PlayerImpl
 import com.example.javanoo6.webpart.model.GameRecord
+import com.example.javanoo6.webpart.model.Player
 import com.example.javanoo6.webpart.repository.GameRepository
 import io.mockk.every
 import io.mockk.mockk
@@ -8,56 +11,69 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.data.mongodb.core.aggregation.AggregationResults
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation
 import java.util.*
 
 internal class GameRecordServiceTest {
 
-    var template = mockk<MongoTemplate>()
+    val name = "someName"
 
-    val aggregation = mockk<TypedAggregation<Any>>()
-    val gameRecord = mockk<GameRecord>()
-    val output = mockk<AggregationResults<GameRecord>>()
-    val gameRepository = mockk<GameRepository>()
-    val gameRecordAsResponse = mockk<Optional<GameRecord>>()
+    private val pingPongTable: PingPongTableImpl = PingPongTableImpl()
+    private val playerOne = PlayerImpl(
+        pingPongTable.playerOneTablePoints,
+        pingPongTable.playerOneTablePointsForShouting,
+        "игрокНомерОдин", 5
+    )
+    private val playerTwo = PlayerImpl(
+        pingPongTable.playerTwoTablePoints,
+        pingPongTable.playerTwoTablePointsForShouting,
+        "ИгрокНомерДва", 6
+    )
 
-    init {
-        every { template.aggregate(aggregation, gameRecord::class.java) } returns output
-        every { gameRepository.findById("someId") } returns gameRecordAsResponse
-        every { gameRepository.save(gameRecord) } returns gameRecord
-    }
 
-    @Test
-    fun findWinnerAndDateByName() {
-        val result = template.aggregate(aggregation, gameRecord::class.java)
+    var theWinner = playerTwo
 
-        println(result)
-        verify { template.aggregate(aggregation, gameRecord::class.java) }
-        assertEquals(output, result)
+    private val gameRepository: GameRepository = mockk<GameRepository>()
 
-    }
+    var template: MongoTemplate = mockk<MongoTemplate>()
 
-    @Test
-    fun findGameById() {
-        val result = template.aggregate(aggregation, gameRecord::class.java)
-        verify { template.aggregate(aggregation, gameRecord::class.java) }
-        assertEquals(output, result)
+    val gameRecordService = GameRecordService(gameRepository, template)
 
-    }
+    val gameRecord = GameRecord(
+        firstParticipant = Player("${playerOne.name}", playerOne.score),
+        secondParticipant = Player("${playerTwo.name}", playerTwo.score),
+        theWinner = Player("${theWinner.name}", theWinner.score)
+    )
 
     @Test
-    fun saveGame() {
-        val result = gameRepository.save(gameRecord)
-        verify { gameRepository.save(gameRecord) }
+    fun `shout find full game by Id`() {
+        every {
+            gameRepository.findById("1")
+        } returns Optional.of(gameRecord)
+
+        val result = gameRecordService.findFullGameById("1")
+        verify { gameRepository.findById("1") }
+        assertEquals(Optional.of(gameRecord), result)
+
+    }
+
+
+    @Test
+    fun `should save game`() {
+        theWinner = playerTwo
+        every {
+            gameRepository.save(
+                gameRecord
+            )
+        } returns gameRecord
+
+        val result = gameRecordService.saveGame(playerOne, playerTwo, theWinner)
+        verify {
+            gameRepository.save(
+                gameRecord
+            )
+        }
         assertEquals(gameRecord, result)
     }
 
-    @Test
-    fun findById() {
-        val result = gameRepository.findById("someId")
-        verify { gameRepository.findById("someId") }
-        assertEquals(gameRecordAsResponse, result)
 
-    }
 }

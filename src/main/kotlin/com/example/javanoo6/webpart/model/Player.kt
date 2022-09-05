@@ -5,6 +5,6 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document("players")
 data class Player(
-    val name: String,
+    val name: String?,
     val score: Int?
 )

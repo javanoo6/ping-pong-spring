@@ -20,9 +20,4 @@ class AppConfig {
     }
 
 
-//    @Bean
-//    fun gameImpl(): GameImpl {
-//        return GameImpl()
-//    }
-
 }
