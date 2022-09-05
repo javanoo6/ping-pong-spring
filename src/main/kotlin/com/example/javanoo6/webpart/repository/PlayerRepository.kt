@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PlayerRepository : MongoRepository<Player, ObjectId> {
-    fun findPlayerByName(name: String): List<Player>
+    fun findPlayerByName(name: String?): List<Player>
 
 }

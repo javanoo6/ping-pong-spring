@@ -6,3 +6,4 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface GameRepository : MongoRepository<GameRecord, String>
+

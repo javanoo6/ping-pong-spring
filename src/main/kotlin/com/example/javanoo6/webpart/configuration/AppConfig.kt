@@ -19,4 +19,5 @@ class AppConfig {
         return MongoTemplate(mongoClient(), "ping_pong_spring")
     }
 
+
 }
