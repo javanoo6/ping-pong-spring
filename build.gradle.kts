@@ -21,20 +21,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
-    implementation("junit:junit:4.13.1")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     implementation("io.vertx:vertx-mongo-client:4.3.3")
-// https://mvnrepository.com/artifact/io.kotest/kotest-runner-junit5-jvm
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:5.4.2")
-
-    testImplementation("io.mockk:mockk:1.12.7")
-
-    testImplementation("com.ninja-squad:springmockk:3.1.1")
-
 }
 
 tasks.withType<KotlinCompile> {
